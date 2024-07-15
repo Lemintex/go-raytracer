@@ -8,13 +8,9 @@ import (
 	"time"
 )
 
-type Pixel struct {
-	R, G, B int
-}
-
 type ImageLine struct {
 	LineNumber int
-	Pixels     []Pixel
+	Pixels     []Color
 }
 
 const (
@@ -27,7 +23,7 @@ func main() {
 	image := make([]ImageLine, height)
 	for y := range height {
 		image[y].LineNumber = y
-		image[y].Pixels = make([]Pixel, width)
+		image[y].Pixels = make([]Color, width)
 	}
 	f, err := os.Create("images/image1.ppm")
 	if err != nil {
@@ -58,14 +54,9 @@ func main() {
 func ProcessLine(line *ImageLine, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for x := range width {
-		r := float64(x) / float64(width)
-		g := float64(line.LineNumber) / float64(height)
-		b := 0.2
-
-		ir := int(255.99 * r)
-		ig := int(255.99 * g)
-		ib := int(255.99 * b)
-
-		line.Pixels[x] = Pixel{ir, ig, ib}
+		r := float32(x) / float32(width)
+		g := float32(line.LineNumber) / float32(height)
+		b := float32(0.2)
+		line.Pixels[x] = WriteColor(r, g, b)
 	}
 }
