@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 )
 
 func main() {
+	start := time.Now()
 	f, err := os.Create("images/output1.ppm")
 	if err != nil {
 		fmt.Println(err)
@@ -37,4 +39,5 @@ func main() {
 			fmt.Fprintf(w, "%d %d %d\n", ir, ig, ib)
 		}
 	}
+	fmt.Println(time.Since(start))
 }
