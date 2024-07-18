@@ -14,8 +14,8 @@ type ImageLine struct {
 }
 
 const (
-	width  = 1920
-	height = 1080
+	width       = 1920
+	aspectRatio = 16.0 / 9.0
 )
 
 var pixel00Location Vec3
@@ -31,15 +31,20 @@ func main() {
 
 	focalLength := 1.0
 	viewportHeight := 2.0
-	viewportWidth := (float64(width) / float64(height)) * viewportHeight
+	viewportWidth := aspectRatio * viewportHeight
 	cameraCenter = Vec3{0, 0, 0}
 
-	viewport_u, viewport_v := Vec3{viewportWidth, 0, 0}, Vec3{0, viewportHeight, 0}
-	pixelDeltaU, pixelDeltaV = viewport_u.DivScalar(float64(width)), viewport_v.DivScalar(float64(height))
+	// Calculate teh vectors on the edges of the viewport
+	viewportU, viewportV := Vec3{viewportWidth, 0, 0}, Vec3{0, viewportHeight, 0}
 
-	viewportLowerLeftCorner := cameraCenter.Sub(viewport_u.DivScalar(2)).Add(viewport_v.DivScalar(2)).Sub(Vec3{0, 0, focalLength})
-	h, v := viewport_u.MulScalar(.5), viewport_v.MulScalar(.5)
-	pixel00Location = viewportLowerLeftCorner.Sub(h.MulScalar(2).Add(v.MulScalar(2).Sub(Vec3{0, 0, focalLength})))
+	// Calculate the delta vectors between pixels
+	pixelDeltaU, pixelDeltaV = viewportU.DivScalar(float64(width)), viewportV.DivScalar(float64(height))
+
+	// Calculate the upper left corner of the viewport
+	h, v := viewportU.MulScalar(.5), viewportV.MulScalar(.5)
+	viewportUpperLeftCorner := cameraCenter.Sub(h).Sub(v).Sub(Vec3{0, 0, focalLength})
+	temp := (pixelDeltaU.Add(pixelDeltaV)).MulScalar(0.5)
+	pixel00Location = viewportUpperLeftCorner.Add(temp)
 	image := make([]ImageLine, height)
 	for y := range height {
 		image[y].LineNumber = y
@@ -64,9 +69,9 @@ func main() {
 	}
 	wg.Wait()
 
-	for _, line := range image {
-		fmt.Println("First pixel: ", line.Pixels[0], "Last pixel: ", line.Pixels[len(line.Pixels)-1])
-	}
+	//	for _, line := range image {
+	//		fmt.Println("First pixel: ", line.Pixels[0], "Last pixel: ", line.Pixels[len(line.Pixels)-1])
+	//	}
 
 	for y := range height {
 		for x := range width {
@@ -84,12 +89,11 @@ func ProcessLine(line *ImageLine, wg *sync.WaitGroup) {
 		rayDirection := pixelCenter.Sub(cameraCenter)
 		r := Ray{cameraCenter, rayDirection}
 
-		// color
 		color := r.Color()
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
 }
 
 func calcHeight() int {
-	return int(float32(width) / 16.0 * 9.0)
+	return int(float32(width) / aspectRatio)
 }
