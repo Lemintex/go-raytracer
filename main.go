@@ -35,7 +35,7 @@ func main() {
 	cameraCenter = Vec3{0, 0, 0}
 
 	// Calculate teh vectors on the edges of the viewport
-	viewportU, viewportV := Vec3{viewportWidth, 0, 0}, Vec3{0, viewportHeight, 0}
+	viewportU, viewportV := Vec3{viewportWidth, 0, 0}, Vec3{0, -viewportHeight, 0}
 
 	// Calculate the delta vectors between pixels
 	pixelDeltaU, pixelDeltaV = viewportU.DivScalar(float64(width)), viewportV.DivScalar(float64(height))

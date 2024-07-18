@@ -11,6 +11,6 @@ func (v Vec3) At(t float64) Vec3 {
 
 func (r Ray) Color() Vec3 {
 	unitDir := r.Direction.Unit()
-	a := 0.5 * (unitDir.Y)
-	return Vec3{0.1, 0.1, 0.1}.MulScalar(1.0 - a).Add(Vec3{1.0, 1.0, 1.0}.MulScalar(a))
+	a := 0.5 * (unitDir.Y + 1.0)
+	return Vec3{1.0, 1.0, 1.0}.MulScalar(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.MulScalar(a))
 }
