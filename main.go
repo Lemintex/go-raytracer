@@ -22,6 +22,7 @@ var pixel00Location Vec3
 var cameraCenter Vec3
 var pixelDeltaU Vec3
 var pixelDeltaV Vec3
+var sphere Sphere //TESTING
 
 func main() {
 	start := time.Now()
@@ -45,6 +46,9 @@ func main() {
 	viewportUpperLeftCorner := cameraCenter.Sub(h).Sub(v).Sub(Vec3{0, 0, focalLength})
 	temp := (pixelDeltaU.Add(pixelDeltaV)).MulScalar(0.5)
 	pixel00Location = viewportUpperLeftCorner.Add(temp)
+
+	//Sphere
+	sphere = Sphere{Vec3{0, 0, -1}, 0.5}
 	image := make([]ImageLine, height)
 	for y := range height {
 		image[y].LineNumber = y
@@ -89,7 +93,7 @@ func ProcessLine(line *ImageLine, wg *sync.WaitGroup) {
 		rayDirection := pixelCenter.Sub(cameraCenter)
 		r := Ray{cameraCenter, rayDirection}
 
-		color := r.Color()
+		color := r.Color(sphere)
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
 }

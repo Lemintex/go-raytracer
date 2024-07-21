@@ -42,6 +42,10 @@ func (v Vec3) Cross(v2 Vec3) Vec3 {
 	return Vec3{v.Y*v2.Z - v.Z*v2.Y, v.Z*v2.X - v.X*v2.Z, v.X*v2.Y - v.Y*v2.X}
 }
 
+func (v Vec3) Neg() Vec3 {
+	return Vec3{-v.X, -v.Y, -v.Z}
+}
+
 func (v Vec3) Length() float64 {
 	return math.Sqrt(v.LengthSquared())
 }
