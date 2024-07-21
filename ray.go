@@ -9,8 +9,8 @@ func (r Ray) PointAt(t float64) Vec3 {
 	return r.Origin.Add(r.Direction.MulScalar(t))
 }
 
-func (r Ray) Color(sphere Sphere) Vec3 {
-	didHit, hit := sphere.Hit(r, 0, 100)
+func (r Ray) Color(world HittableList) Vec3 {
+	didHit, hit := world.Hit(r, 0, 100)
 	if didHit {
 		normal := r.PointAt(hit.T).Sub(Vec3{0, 0, -1}).Unit()
 		return normal.Add(Vec3{1, 1, 1}).MulScalar(0.5)

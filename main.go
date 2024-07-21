@@ -22,10 +22,11 @@ var pixel00Location Vec3
 var cameraCenter Vec3
 var pixelDeltaU Vec3
 var pixelDeltaV Vec3
-var sphere Sphere //TESTING
+var world HittableList
 
 func main() {
 	start := time.Now()
+	world = HittableList{}
 	height := calcHeight()
 
 	// camera
@@ -47,14 +48,15 @@ func main() {
 	temp := (pixelDeltaU.Add(pixelDeltaV)).MulScalar(0.5)
 	pixel00Location = viewportUpperLeftCorner.Add(temp)
 
-	//Sphere
-	sphere = Sphere{Vec3{0, 0, -1}, 0.5}
+	// world
+	world.Add(Sphere{Vec3{0, 0, -1}, 0.5})
+	world.Add(Sphere{Vec3{0, -100.5, -1}, 100})
 	image := make([]ImageLine, height)
 	for y := range height {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, width)
 	}
-	f, err := os.Create("images/image4.ppm")
+	f, err := os.Create("images/image5.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -93,7 +95,7 @@ func ProcessLine(line *ImageLine, wg *sync.WaitGroup) {
 		rayDirection := pixelCenter.Sub(cameraCenter)
 		r := Ray{cameraCenter, rayDirection}
 
-		color := r.Color(sphere)
+		color := r.Color(world)
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
 }
