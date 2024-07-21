@@ -53,6 +53,7 @@ func (v Vec3) Length() float64 {
 func (v Vec3) LengthSquared() float64 {
 	return v.Dot(v)
 }
+
 func (v Vec3) Unit() Vec3 {
 	return v.DivScalar(v.Length())
 }
