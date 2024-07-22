@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 type Ray struct {
 	Origin    Vec3
 	Direction Vec3
@@ -10,7 +12,7 @@ func (r Ray) PointAt(t float64) Vec3 {
 }
 
 func (r Ray) Color(world HittableList) Vec3 {
-	didHit, hit := world.Hit(r, 0, 100000)
+	didHit, hit := world.Hit(r, Interval{0, math.Inf(1)})
 	if didHit {
 		return hit.Normal.Add(Vec3{1, 1, 1}).MulScalar(0.5)
 	}

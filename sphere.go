@@ -7,7 +7,7 @@ type Sphere struct {
 	Radius float64
 }
 
-func (s Sphere) Hit(r Ray, tMin float64, tMax float64) (bool, HitInfo) {
+func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	oc := r.Origin.Sub(s.Center)
 	a := r.Direction.LengthSquared()
 	h := oc.Dot(r.Direction)
@@ -21,9 +21,9 @@ func (s Sphere) Hit(r Ray, tMin float64, tMax float64) (bool, HitInfo) {
 
 	// Find the nearest root that lies in the acceptable range.
 	root := (-h - sqrtDiscriminant) / a
-	if root < tMin || tMax < root {
+	if !i.Contains(root) {
 		root = (-h + sqrtDiscriminant) / a
-		if root < tMin || tMax < root {
+		if !i.Contains(root) {
 			return false, HitInfo{}
 		}
 	}

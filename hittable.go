@@ -7,5 +7,5 @@ type HitInfo struct {
 }
 
 type Hittable interface {
-	Hit(r Ray, tMin float64, tMax float64) (bool, HitInfo)
+	Hit(r Ray, i Interval) (bool, HitInfo)
 }
