@@ -10,10 +10,9 @@ func (r Ray) PointAt(t float64) Vec3 {
 }
 
 func (r Ray) Color(world HittableList) Vec3 {
-	didHit, hit := world.Hit(r, 0, 100)
+	didHit, hit := world.Hit(r, 0, 100000)
 	if didHit {
-		normal := r.PointAt(hit.T).Sub(Vec3{0, 0, -1}).Unit()
-		return normal.Add(Vec3{1, 1, 1}).MulScalar(0.5)
+		return hit.Normal.Add(Vec3{1, 1, 1}).MulScalar(0.5)
 	}
 	unitDir := r.Direction.Unit()
 	a := 0.5 * (unitDir.Y + 1.0)
