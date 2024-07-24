@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -30,6 +29,7 @@ func main() {
 	height := calcHeight()
 
 	// camera
+	cam := Camera{}
 
 	focalLength := 1.0
 	viewportHeight := 2.0
@@ -68,36 +68,16 @@ func main() {
 
 	fmt.Fprintf(w, "P3\n%d %d\n%d\n", width, height, 255)
 
-	wg := sync.WaitGroup{}
-	wg.Add(height)
-	for y := range height {
-		go ProcessLine(&image[y], &wg)
-	}
-	wg.Wait()
-
-	//	for _, line := range image {
-	//		fmt.Println("First pixel: ", line.Pixels[0], "Last pixel: ", line.Pixels[len(line.Pixels)-1])
-	//	}
+	fmt.Println("P3")
+	image = cam.Render(image, world)
 
 	for y := range height {
 		for x := range width {
+			// fmt.Println(image[y].Pixels[x])
 			fmt.Fprintf(w, "%d %d %d\n", image[y].Pixels[x].R, image[y].Pixels[x].G, image[y].Pixels[x].B)
 		}
 	}
 	fmt.Println(time.Since(start))
-}
-
-func ProcessLine(line *ImageLine, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for x := range width {
-		u, v := pixelDeltaU.MulScalar(float64(x)), pixelDeltaV.MulScalar(float64(line.LineNumber))
-		pixelCenter := pixel00Location.Add(u).Add(v)
-		rayDirection := pixelCenter.Sub(cameraCenter)
-		r := Ray{cameraCenter, rayDirection}
-
-		color := r.Color(world)
-		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
-	}
 }
 
 func calcHeight() int {
