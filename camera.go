@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 type Camera struct {
@@ -23,15 +24,13 @@ type Camera struct {
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	c.initialize()
 
-	// wg := sync.WaitGroup{}
-	// wg.Add(c.Imageheight)
+	wg := sync.WaitGroup{}
+	wg.Add(c.Imageheight)
 	for y := range c.Imageheight {
-		/*go*/ image[y] = c.ProcessLine(world, image[y]) //, &wg)
-		fmt.Println("Line", y, "done")
-		fmt.Println(image[y])
+		go c.ProcessLine(world, &image[y], &wg)
 	}
 	fmt.Println(world.Objects)
-	// wg.Wait()
+	wg.Wait()
 	return image
 }
 func (c *Camera) initialize() {
@@ -40,18 +39,20 @@ func (c *Camera) initialize() {
 	c.ImageWidth = 1920
 	c.Imageheight = int(float64(c.ImageWidth) / c.AspectRatio)
 	c.Origin = Vec3{0.0, 0.0, 0.0}
-	c.viewportWidth = 2.0
-	c.viewportHeight = c.viewportWidth / c.AspectRatio
+	c.viewportHeight = 2.0
+	c.viewportWidth = c.AspectRatio * c.viewportHeight
 	c.ViewportU = Vec3{c.viewportWidth, 0, 0}
 	c.ViewportV = Vec3{0, -c.viewportHeight, 0}
+	c.PixelDeltaU = c.ViewportU.DivScalar(float64(c.ImageWidth))
+	c.PixelDeltaV = c.ViewportV.DivScalar(float64(c.Imageheight))
 	h, v := c.ViewportU.MulScalar(0.5), c.ViewportV.MulScalar(0.5)
 	c.viewportUpperLeftCorner = c.Origin.Sub(h).Sub(v).Sub(Vec3{0, 0, c.FocalLength})
 	temp := c.PixelDeltaU.Add(c.PixelDeltaV).MulScalar(0.5)
 	c.Pixel00Location = c.viewportUpperLeftCorner.Add(temp)
 }
 
-func (c Camera) ProcessLine(world HittableList, line ImageLine /*, wg *sync.WaitGroup*/) ImageLine {
-	// defer wg.Done()
+func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for x := range c.ImageWidth {
 		u, v := c.PixelDeltaU.MulScalar(float64(x)), c.PixelDeltaV.MulScalar(float64(line.LineNumber))
 		pixelCenter := c.Pixel00Location.Add(u).Add(v)
@@ -60,5 +61,4 @@ func (c Camera) ProcessLine(world HittableList, line ImageLine /*, wg *sync.Wait
 		color := r.Color(world)
 		line.Pixels[x] = Color{int(color.X * 255.999), int(color.Y * 255.999), int(color.Z * 255.999)}
 	}
-	return line
 }
