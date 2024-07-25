@@ -9,7 +9,7 @@ type Camera struct {
 	AspectRatio             float64
 	FocalLength             float64
 	ImageWidth              int
-	Imageheight             int
+	ImageHeight             int
 	viewportWidth           float64
 	viewportHeight          float64
 	viewportUpperLeftCorner Vec3
@@ -25,8 +25,8 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	c.initialize()
 
 	wg := sync.WaitGroup{}
-	wg.Add(c.Imageheight)
-	for y := range c.Imageheight {
+	wg.Add(c.ImageHeight)
+	for y := range c.ImageHeight {
 		go c.ProcessLine(world, &image[y], &wg)
 	}
 	fmt.Println(world.Objects)
@@ -34,17 +34,21 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	return image
 }
 func (c *Camera) initialize() {
+	// image info
 	c.AspectRatio = 16.0 / 9.0
+	c.ImageWidth, c.ImageHeight = 1920, int(float64(c.ImageWidth)/c.AspectRatio)
+
+	// camera info
 	c.FocalLength = 1.0
-	c.ImageWidth = 1920
-	c.Imageheight = int(float64(c.ImageWidth) / c.AspectRatio)
 	c.Origin = Vec3{0.0, 0.0, 0.0}
-	c.viewportHeight = 2.0
-	c.viewportWidth = c.AspectRatio * c.viewportHeight
-	c.ViewportU = Vec3{c.viewportWidth, 0, 0}
-	c.ViewportV = Vec3{0, -c.viewportHeight, 0}
-	c.PixelDeltaU = c.ViewportU.DivScalar(float64(c.ImageWidth))
-	c.PixelDeltaV = c.ViewportV.DivScalar(float64(c.Imageheight))
+
+	// viewport info
+	c.viewportHeight, c.viewportWidth = 2.0, c.AspectRatio*c.viewportHeight
+	c.ViewportU, c.ViewportV = Vec3{c.viewportWidth, 0, 0}, Vec3{0, -c.viewportHeight, 0}
+
+	// pixel info
+	c.PixelDeltaU, c.PixelDeltaV = c.ViewportU.DivScalar(float64(c.ImageWidth)), c.ViewportV.DivScalar(float64(c.ImageHeight))
+
 	h, v := c.ViewportU.MulScalar(0.5), c.ViewportV.MulScalar(0.5)
 	c.viewportUpperLeftCorner = c.Origin.Sub(h).Sub(v).Sub(Vec3{0, 0, c.FocalLength})
 	temp := c.PixelDeltaU.Add(c.PixelDeltaV).MulScalar(0.5)
