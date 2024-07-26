@@ -57,3 +57,7 @@ func (v Vec3) LengthSquared() float64 {
 func (v Vec3) Unit() Vec3 {
 	return v.DivScalar(v.Length())
 }
+
+func SampleSquare() Vec3 {
+	return Vec3{RandomFloatBetweenMinAndMax(-0.5, 0.5), RandomFloatBetweenMinAndMax(-0.5, 0.5), 0}
+}

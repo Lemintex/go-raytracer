@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 )
 
 type Camera struct {
+	SamplesPerPixel         int
 	AspectRatio             float64
 	FocalLength             float64
 	ImageWidth              int
@@ -22,28 +22,28 @@ type Camera struct {
 }
 
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
-	c.initialize()
-
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		go c.ProcessLine(world, &image[y], &wg)
+		c.ProcessLine(world, &image[y], &wg)
 	}
-	fmt.Println(world.Objects)
 	wg.Wait()
 	return image
 }
-func (c *Camera) initialize() {
+func (c *Camera) Initialize() {
 	// image info
 	c.AspectRatio = 16.0 / 9.0
-	c.ImageWidth, c.ImageHeight = 1920, int(float64(c.ImageWidth)/c.AspectRatio)
+	c.ImageWidth = 64
+	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
+	c.SamplesPerPixel = 10
 	c.FocalLength = 1.0
 	c.Origin = Vec3{0.0, 0.0, 0.0}
 
 	// viewport info
-	c.viewportHeight, c.viewportWidth = 2.0, c.AspectRatio*c.viewportHeight
+	c.viewportHeight = 2.0
+	c.viewportWidth = c.AspectRatio * c.viewportHeight
 	c.ViewportU, c.ViewportV = Vec3{c.viewportWidth, 0, 0}, Vec3{0, -c.viewportHeight, 0}
 
 	// pixel info
@@ -58,11 +58,12 @@ func (c *Camera) initialize() {
 func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for x := range c.ImageWidth {
-		u, v := c.PixelDeltaU.MulScalar(float64(x)), c.PixelDeltaV.MulScalar(float64(line.LineNumber))
-		pixelCenter := c.Pixel00Location.Add(u).Add(v)
-		rayDirection := pixelCenter.Sub(c.Origin)
-		r := Ray{c.Origin, rayDirection}
-		color := r.Color(world)
+		var pixelColor Vec3
+		for range c.SamplesPerPixel {
+			r := GetRay(c, x, line.LineNumber)
+			pixelColor = pixelColor.Add(r.Color(world))
+		}
+		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
 		line.Pixels[x] = Color{int(color.X * 255.999), int(color.Y * 255.999), int(color.Z * 255.999)}
 	}
 }
