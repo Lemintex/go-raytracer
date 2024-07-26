@@ -20,6 +20,7 @@ func main() {
 
 	// camera
 	cam := Camera{}
+	cam.Initialize()
 
 	// world
 	world.Add(Sphere{Vec3{0, 0, -1}, 0.5})
@@ -29,7 +30,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image5.ppm")
+	f, err := os.Create("images/image6.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -22,28 +22,28 @@ type Camera struct {
 }
 
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
-	c.initialize()
 
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		go c.ProcessLine(world, &image[y], &wg)
+		c.ProcessLine(world, &image[y], &wg)
 	}
 	fmt.Println(world.Objects)
 	wg.Wait()
 	return image
 }
-func (c *Camera) initialize() {
+func (c *Camera) Initialize() {
 	// image info
 	c.AspectRatio = 16.0 / 9.0
-	c.ImageWidth, c.ImageHeight = 1920, int(float64(c.ImageWidth)/c.AspectRatio)
-
+	c.ImageWidth = 64
+	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 	// camera info
 	c.FocalLength = 1.0
 	c.Origin = Vec3{0.0, 0.0, 0.0}
 
 	// viewport info
-	c.viewportHeight, c.viewportWidth = 2.0, c.AspectRatio*c.viewportHeight
+	c.viewportHeight = 2.0
+	c.viewportWidth = c.AspectRatio * c.viewportHeight
 	c.ViewportU, c.ViewportV = Vec3{c.viewportWidth, 0, 0}, Vec3{0, -c.viewportHeight, 0}
 
 	// pixel info
