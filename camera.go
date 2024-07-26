@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 )
 
 type Camera struct {
+	SamplesPerPixel         int
 	AspectRatio             float64
 	FocalLength             float64
 	ImageWidth              int
@@ -22,13 +22,11 @@ type Camera struct {
 }
 
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
-
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
 		c.ProcessLine(world, &image[y], &wg)
 	}
-	fmt.Println(world.Objects)
 	wg.Wait()
 	return image
 }
@@ -37,7 +35,9 @@ func (c *Camera) Initialize() {
 	c.AspectRatio = 16.0 / 9.0
 	c.ImageWidth = 64
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
+
 	// camera info
+	c.SamplesPerPixel = 10
 	c.FocalLength = 1.0
 	c.Origin = Vec3{0.0, 0.0, 0.0}
 
@@ -58,11 +58,12 @@ func (c *Camera) Initialize() {
 func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for x := range c.ImageWidth {
-		u, v := c.PixelDeltaU.MulScalar(float64(x)), c.PixelDeltaV.MulScalar(float64(line.LineNumber))
-		pixelCenter := c.Pixel00Location.Add(u).Add(v)
-		rayDirection := pixelCenter.Sub(c.Origin)
-		r := Ray{c.Origin, rayDirection}
-		color := r.Color(world)
+		var pixelColor Vec3
+		for range c.SamplesPerPixel {
+			r := GetRay(c, x, line.LineNumber)
+			pixelColor = pixelColor.Add(r.Color(world))
+		}
+		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
 		line.Pixels[x] = Color{int(color.X * 255.999), int(color.Y * 255.999), int(color.Z * 255.999)}
 	}
 }

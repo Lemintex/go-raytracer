@@ -20,3 +20,11 @@ func (r Ray) Color(world HittableList) Vec3 {
 	a := 0.5 * (unitDir.Y + 1.0)
 	return Vec3{1.0, 1.0, 1.0}.MulScalar(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.MulScalar(a))
 }
+
+func GetRay(c Camera, x, y int) Ray {
+	offset := SampleSquare()
+	pixelSample := c.Pixel00Location.Add(c.PixelDeltaU.MulScalar(float64(x) + offset.X).Add(c.PixelDeltaV.MulScalar(float64(y) + offset.Y)))
+	rayOrigin := c.Origin
+	rayDirection := pixelSample.Sub(c.Origin)
+	return Ray{rayOrigin, rayDirection}
+}
