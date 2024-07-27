@@ -61,3 +61,33 @@ func (v Vec3) Unit() Vec3 {
 func SampleSquare() Vec3 {
 	return Vec3{RandomFloatBetweenMinAndMax(-0.5, 0.5), RandomFloatBetweenMinAndMax(-0.5, 0.5), 0}
 }
+
+func RandomVec3() Vec3 {
+	return Vec3{RandomFloat(), RandomFloat(), RandomFloat()}
+}
+
+func RandomVec3BetweenMinAndMax(min, max float64) Vec3 {
+	return Vec3{RandomFloatBetweenMinAndMax(min, max), RandomFloatBetweenMinAndMax(min, max), RandomFloatBetweenMinAndMax(min, max)}
+}
+
+func RandomVec3InUnitSphere() Vec3 {
+	for range 100 {
+		p := RandomVec3BetweenMinAndMax(-1, 1)
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
+	return Vec3{}
+}
+
+func RandomUnitVec3() Vec3 {
+	return RandomVec3InUnitSphere().Unit()
+}
+
+func RandomVec3OnHemisphere(normal Vec3) Vec3 {
+	inUnitSphere := RandomVec3InUnitSphere()
+	if inUnitSphere.Dot(normal) > 0.0 {
+		return inUnitSphere
+	}
+	return inUnitSphere.Neg()
+}
