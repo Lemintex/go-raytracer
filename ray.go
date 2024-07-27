@@ -11,10 +11,15 @@ func (r Ray) PointAt(t float64) Vec3 {
 	return r.Origin.Add(r.Direction.MulScalar(t))
 }
 
-func (r Ray) Color(world HittableList) Vec3 {
-	didHit, hit := world.Hit(r, Interval{0, math.Inf(1)})
+func (r Ray) Color(world HittableList, bounce int) Vec3 {
+	if bounce == 0 {
+		return Vec3{0, 0, 0}
+	}
+	didHit, hit := world.Hit(r, Interval{0.001, math.Inf(1)})
 	if didHit {
-		return hit.Normal.Add(Vec3{1, 1, 1}).MulScalar(0.5)
+		direction := hit.Normal.Add(RandomUnitVec3())
+		r := Ray{hit.Point, direction}
+		return r.Color(world, bounce-1).MulScalar(0.5)
 	}
 	unitDir := r.Direction.Unit()
 	a := 0.5 * (unitDir.Y + 1.0)

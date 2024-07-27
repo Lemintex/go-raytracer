@@ -33,11 +33,11 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 func (c *Camera) Initialize() {
 	// image info
 	c.AspectRatio = 16.0 / 9.0
-	c.ImageWidth = 64
+	c.ImageWidth = 1920
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 10
+	c.SamplesPerPixel = 2
 	c.FocalLength = 1.0
 	c.Origin = Vec3{0.0, 0.0, 0.0}
 
@@ -61,9 +61,9 @@ func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGr
 		var pixelColor Vec3
 		for range c.SamplesPerPixel {
 			r := GetRay(c, x, line.LineNumber)
-			pixelColor = pixelColor.Add(r.Color(world))
+			pixelColor = pixelColor.Add(r.Color(world, 5))
 		}
 		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
-		line.Pixels[x] = Color{int(color.X * 255.999), int(color.Y * 255.999), int(color.Z * 255.999)}
+		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
 }
