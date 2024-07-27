@@ -17,7 +17,7 @@ func (r Ray) Color(world HittableList, bounce int) Vec3 {
 	}
 	didHit, hit := world.Hit(r, Interval{0.001, math.Inf(1)})
 	if didHit {
-		direction := RandomVec3OnHemisphere(hit.Normal)
+		direction := hit.Normal.Add(RandomUnitVec3())
 		r := Ray{hit.Point, direction}
 		return r.Color(world, bounce-1).MulScalar(0.5)
 	}
