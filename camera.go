@@ -64,6 +64,6 @@ func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGr
 			pixelColor = pixelColor.Add(r.Color(world, 5))
 		}
 		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
-		line.Pixels[x] = Color{int(color.X * 255.999), int(color.Y * 255.999), int(color.Z * 255.999)}
+		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
 }
