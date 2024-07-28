@@ -100,3 +100,10 @@ func (v Vec3) IsNearZero() bool {
 func (v Vec3) Reflect(n Vec3) Vec3 {
 	return v.Sub(n.MulScalar(2 * v.Dot(n)))
 }
+
+func (v Vec3) Refract(n Vec3, etaiOverEtat float64) Vec3 {
+	cosTheta := math.Min(v.Neg().Dot(n), 1.0)
+	rOutPerp := v.Add(n.MulScalar(cosTheta)).MulScalar(etaiOverEtat)
+	rOutParallel := n.MulScalar(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
+	return rOutPerp.Add(rOutParallel)
+}

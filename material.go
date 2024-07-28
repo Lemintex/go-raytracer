@@ -27,3 +27,20 @@ func (m Metal) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 	scattered := Ray{hit.Point, reflected}
 	return scattered.Direction.Dot(hit.Normal) > 0, scattered, m.Albedo
 }
+
+type Dielectric struct {
+	RefractionIndex float64
+}
+
+func (d Dielectric) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
+	attenuation := Vec3{1, 1, 1}
+	ri := d.RefractionIndex
+	if hit.FrontFace {
+		ri = 1 / d.RefractionIndex
+	}
+	unitDirection := ray.Direction.Unit()
+	refracted := unitDirection.Refract(hit.Normal, ri)
+
+	scattered := Ray{hit.Point, refracted}
+	return true, scattered, attenuation
+}

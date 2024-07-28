@@ -26,7 +26,7 @@ func main() {
 	materialGround := Lambertian{Vec3{0.8, 0.8, 0.0}}
 	materialCenter := Lambertian{Vec3{0.1, 0.2, 0.5}}
 	materialLeft := Metal{Vec3{0.8, 0.8, 0.8}, 0.3}
-	materialRight := Metal{Vec3{0.8, 0.6, 0.2}, 0.0}
+	materialRight := Dielectric{1.5}
 
 	world.Add(Sphere{Vec3{0, -100.5, -1}, 100, materialGround})
 	world.Add(Sphere{Vec3{0, 0, -1}, 0.5, materialCenter})
@@ -38,7 +38,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image13.ppm")
+	f, err := os.Create("images/image14.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return

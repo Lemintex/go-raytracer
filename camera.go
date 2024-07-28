@@ -25,7 +25,7 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		c.ProcessLine(world, &image[y], &wg)
+		go c.ProcessLine(world, &image[y], &wg)
 	}
 	wg.Wait()
 	return image

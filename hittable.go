@@ -1,10 +1,11 @@
 package main
 
 type HitInfo struct {
-	Point    Vec3
-	Normal   Vec3
-	Material Material
-	T        float64
+	Point     Vec3
+	Normal    Vec3
+	Material  Material
+	T         float64
+	FrontFace bool
 }
 
 type Hittable interface {
