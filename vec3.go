@@ -91,3 +91,12 @@ func RandomVec3OnHemisphere(normal Vec3) Vec3 {
 	}
 	return inUnitSphere.Neg()
 }
+
+func (v Vec3) IsNearZero() bool {
+	s := 1e-6
+	return math.Abs(v.X) < s && math.Abs(v.Y) < s && math.Abs(v.Z) < s
+}
+
+func (v Vec3) Reflect(n Vec3) Vec3 {
+	return v.Sub(n.MulScalar(2 * v.Dot(n)))
+}

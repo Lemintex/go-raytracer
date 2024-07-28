@@ -23,14 +23,22 @@ func main() {
 	cam.Initialize()
 
 	// world
-	world.Add(Sphere{Vec3{0, 0, -1}, 0.5})
-	world.Add(Sphere{Vec3{0, -100.5, -1}, 100})
+	materialGround := Lambertian{Vec3{0.8, 0.8, 0.0}}
+	materialCenter := Lambertian{Vec3{0.1, 0.2, 0.5}}
+	materialLeft := Metal{Vec3{0.8, 0.8, 0.8}}
+	materialRight := Metal{Vec3{0.8, 0.6, 0.2}}
+
+	world.Add(Sphere{Vec3{0, -100.5, -1}, 100, materialGround})
+	world.Add(Sphere{Vec3{0, 0, -1}, 0.5, materialCenter})
+	world.Add(Sphere{Vec3{-1, 0, -1}, 0.5, materialLeft})
+	world.Add(Sphere{Vec3{1, 0, -1}, 0.5, materialRight})
+
 	image := make([]ImageLine, cam.ImageHeight)
 	for y := range cam.ImageHeight {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image11.ppm")
+	f, err := os.Create("images/image12.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -3,8 +3,9 @@ package main
 import "math"
 
 type Sphere struct {
-	Center Vec3
-	Radius float64
+	Center   Vec3
+	Radius   float64
+	Material Material
 }
 
 func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
@@ -31,9 +32,10 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	point := r.PointAt(root)
 	normal := point.Sub(s.Center).DivScalar(s.Radius)
 	hitInfo := HitInfo{
-		Point:  point,
-		Normal: normal,
-		T:      root,
+		Point:    point,
+		Normal:   normal,
+		Material: s.Material, //FIXME: Material is not defined
+		T:        root,
 	}
 	return true, hitInfo
 }
