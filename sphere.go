@@ -35,9 +35,9 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	hitInfo := HitInfo{
 		Point:     point,
 		Normal:    normal,
-		Material:  s.Material, //FIXME: Material is not defined
+		Material:  s.Material,
 		T:         root,
-		FrontFace: frontFace, //FIXME: FrontFace is not defined
+		FrontFace: frontFace,
 	}
 	return true, hitInfo
 }
