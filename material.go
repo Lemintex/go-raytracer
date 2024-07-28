@@ -46,7 +46,7 @@ func (d Dielectric) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 	sinTheta := math.Sqrt(1.0 - cosTheta*cosTheta)
 	var direction Vec3
 	cannotRefract := ri*sinTheta > 1.0
-	if cannotRefract {
+	if cannotRefract || d.Schlick(cosTheta, ri) > RandomFloat() {
 		direction = unitDirection.Reflect(hit.Normal)
 	} else {
 		direction = unitDirection.Refract(hit.Normal, ri)
@@ -54,4 +54,10 @@ func (d Dielectric) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 
 	scattered := Ray{hit.Point, direction}
 	return true, scattered, attenuation
+}
+
+func (d Dielectric) Schlick(cosine float64, refractionIndex float64) float64 {
+	r0 := (1 - refractionIndex) / (1 + refractionIndex)
+	r0 = r0 * r0
+	return r0 + (1-r0)*math.Pow(1-cosine, 5)
 }
