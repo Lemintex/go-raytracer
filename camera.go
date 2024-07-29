@@ -25,7 +25,7 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		c.ProcessLine(world, &image[y], &wg)
+		go c.ProcessLine(world, &image[y], &wg)
 	}
 	wg.Wait()
 	return image
@@ -61,7 +61,7 @@ func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGr
 		var pixelColor Vec3
 		for range c.SamplesPerPixel {
 			r := GetRay(c, x, line.LineNumber)
-			pixelColor = pixelColor.Add(r.Color(world, 5))
+			pixelColor = pixelColor.Add(r.Color(world, 25))
 		}
 		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
