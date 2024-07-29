@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"sync"
 )
 
@@ -12,6 +13,7 @@ type Camera struct {
 	ImageHeight             int
 	viewportWidth           float64
 	viewportHeight          float64
+	ViewportFOV             int
 	viewportUpperLeftCorner Vec3
 	Origin                  Vec3
 	Pixel00Location         Vec3
@@ -42,7 +44,10 @@ func (c *Camera) Initialize() {
 	c.Origin = Vec3{0.0, 0.0, 0.0}
 
 	// viewport info
-	c.viewportHeight = 2.0
+	c.ViewportFOV = 40
+	theta := DegreesToRadians(float64(c.ViewportFOV))
+	vh := math.Tan(theta / 2.0)
+	c.viewportHeight = 2.0 * vh * c.FocalLength
 	c.viewportWidth = c.AspectRatio * c.viewportHeight
 	c.ViewportU, c.ViewportV = Vec3{c.viewportWidth, 0, 0}, Vec3{0, -c.viewportHeight, 0}
 
