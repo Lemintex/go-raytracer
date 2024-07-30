@@ -58,6 +58,16 @@ func (v Vec3) Unit() Vec3 {
 	return v.DivScalar(v.Length())
 }
 
+func RandomInUnitDisk() Vec3 {
+	for range 100 {
+		p := Vec3{RandomFloatBetweenMinAndMax(-1, 1), RandomFloatBetweenMinAndMax(-1, 1), 0}
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
+	return Vec3{}
+}
+
 func SampleSquare() Vec3 {
 	return Vec3{RandomFloatBetweenMinAndMax(-0.5, 0.5), RandomFloatBetweenMinAndMax(-0.5, 0.5), 0}
 }

@@ -26,6 +26,12 @@ type Camera struct {
 	LookFrom Vec3
 	LookAt   Vec3
 	VUp      Vec3
+
+	// defocus blur
+	DefocusAngle  float64
+	FocusDistance float64
+	DefocusDiskU  Vec3
+	DefocusDiskV  Vec3
 }
 
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
@@ -44,6 +50,10 @@ func (c *Camera) Initialize() {
 	c.LookAt = Vec3{0, 0, -1}
 	c.VUp = Vec3{0, 1, 0}
 
+	// defocus blur
+	c.DefocusAngle = 2.1
+	c.FocusDistance = 1
+
 	// image info
 	c.AspectRatio = 16.0 / 9.0
 	c.ImageWidth = 1920
@@ -57,11 +67,12 @@ func (c *Camera) Initialize() {
 	w := c.LookFrom.Sub(c.LookAt).Unit()
 	u := c.VUp.Cross(w).Unit()
 	v := w.Cross(u)
+
 	// viewport info
 	c.ViewportFOV = 20
 	theta := DegreesToRadians(float64(c.ViewportFOV))
 	vh := math.Tan(theta / 2.0)
-	c.viewportHeight = 2.0 * vh * c.FocalLength
+	c.viewportHeight = 2.0 * vh * c.FocusDistance
 	c.viewportWidth = c.AspectRatio * c.viewportHeight
 	c.ViewportU, c.ViewportV = u.MulScalar(c.viewportWidth), v.MulScalar(-c.viewportHeight)
 
@@ -69,7 +80,12 @@ func (c *Camera) Initialize() {
 	c.PixelDeltaU, c.PixelDeltaV = c.ViewportU.DivScalar(float64(c.ImageWidth)), c.ViewportV.DivScalar(float64(c.ImageHeight))
 
 	h, v := c.ViewportU.MulScalar(0.5), c.ViewportV.MulScalar(0.5)
-	c.viewportUpperLeftCorner = c.Origin.Sub(h).Sub(v).Sub(w.MulScalar(c.FocalLength))
+
+	// defocus disk
+	DefocusRadius := c.FocusDistance * math.Tan(DegreesToRadians(c.DefocusAngle)) / 2
+	c.DefocusDiskU = u.MulScalar(DefocusRadius)
+	c.DefocusDiskV = v.MulScalar(DefocusRadius)
+	c.viewportUpperLeftCorner = c.Origin.Sub(h).Sub(v).Sub(w.MulScalar(c.FocusDistance))
 	temp := c.PixelDeltaU.Add(c.PixelDeltaV).MulScalar(0.5)
 	c.Pixel00Location = c.viewportUpperLeftCorner.Add(temp)
 

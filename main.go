@@ -40,7 +40,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image19.ppm")
+	f, err := os.Create("images/image20.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
