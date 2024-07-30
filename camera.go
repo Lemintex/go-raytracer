@@ -58,7 +58,7 @@ func (c *Camera) Initialize() {
 	u := c.VUp.Cross(w).Unit()
 	v := w.Cross(u)
 	// viewport info
-	c.ViewportFOV = 90
+	c.ViewportFOV = 20
 	theta := DegreesToRadians(float64(c.ViewportFOV))
 	vh := math.Tan(theta / 2.0)
 	c.viewportHeight = 2.0 * vh * c.FocalLength
