@@ -39,7 +39,7 @@ func GetRay(c Camera, x, y int) Ray {
 	} else {
 		rayOrigin = DefocusDiskSample(c)
 	}
-	rayDirection := pixelSample.Sub(c.Origin)
+	rayDirection := pixelSample.Sub(rayOrigin)
 	return Ray{rayOrigin, rayDirection}
 }
 

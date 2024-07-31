@@ -51,8 +51,8 @@ func (c *Camera) Initialize() {
 	c.VUp = Vec3{0, 1, 0}
 
 	// defocus blur
-	c.DefocusAngle = 2.1
-	c.FocusDistance = 1
+	c.DefocusAngle = 10
+	c.FocusDistance = 3.4
 
 	// image info
 	c.AspectRatio = 16.0 / 9.0
@@ -82,7 +82,7 @@ func (c *Camera) Initialize() {
 	h, v := c.ViewportU.MulScalar(0.5), c.ViewportV.MulScalar(0.5)
 
 	// defocus disk
-	DefocusRadius := c.FocusDistance * math.Tan(DegreesToRadians(c.DefocusAngle)) / 2
+	DefocusRadius := c.FocusDistance * math.Tan(DegreesToRadians(c.DefocusAngle/2))
 	c.DefocusDiskU = u.MulScalar(DefocusRadius)
 	c.DefocusDiskV = v.MulScalar(DefocusRadius)
 	c.viewportUpperLeftCorner = c.Origin.Sub(h).Sub(v).Sub(w.MulScalar(c.FocusDistance))
