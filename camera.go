@@ -45,13 +45,13 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 }
 func (c *Camera) Initialize() {
 	// camera position
-	c.LookFrom = Vec3{-2, 2, 1}
+	c.LookFrom = Vec3{3, 3, -1}
 	c.Origin = c.LookFrom
-	c.LookAt = Vec3{0, 0, -1}
+	c.LookAt = Vec3{0, 1, 0}
 	c.VUp = Vec3{0, 1, 0}
 
 	// defocus blur
-	c.DefocusAngle = 10
+	c.DefocusAngle = 1
 	c.FocusDistance = 3.4
 
 	// image info
@@ -60,7 +60,7 @@ func (c *Camera) Initialize() {
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 2
+	c.SamplesPerPixel = 100
 	c.FocalLength = c.LookFrom.Sub(c.LookAt).Length()
 
 	// camera coordinate frame
@@ -69,7 +69,7 @@ func (c *Camera) Initialize() {
 	v := w.Cross(u)
 
 	// viewport info
-	c.ViewportFOV = 20
+	c.ViewportFOV = 90
 	theta := DegreesToRadians(float64(c.ViewportFOV))
 	vh := math.Tan(theta / 2.0)
 	c.viewportHeight = 2.0 * vh * c.FocusDistance
