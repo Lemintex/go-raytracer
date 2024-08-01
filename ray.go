@@ -33,7 +33,17 @@ func (r Ray) Color(world HittableList, bounce int) Vec3 {
 func GetRay(c Camera, x, y int) Ray {
 	offset := SampleSquare()
 	pixelSample := c.Pixel00Location.Add(c.PixelDeltaU.MulScalar(float64(x) + offset.X).Add(c.PixelDeltaV.MulScalar(float64(y) + offset.Y)))
-	rayOrigin := c.Origin
-	rayDirection := pixelSample.Sub(c.Origin)
+	var rayOrigin Vec3
+	if c.DefocusAngle <= 0 {
+		rayOrigin = c.Origin
+	} else {
+		rayOrigin = DefocusDiskSample(c)
+	}
+	rayDirection := pixelSample.Sub(rayOrigin)
 	return Ray{rayOrigin, rayDirection}
+}
+
+func DefocusDiskSample(c Camera) Vec3 {
+	p := RandomInUnitDisk()
+	return c.Origin.Add(c.DefocusDiskU.MulScalar(p.X)).Add(c.DefocusDiskV.MulScalar(p.Y))
 }
