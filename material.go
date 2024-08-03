@@ -15,7 +15,8 @@ func (l Lambertian) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 	if direction.IsNearZero() {
 		direction = hit.Normal
 	}
-	scattered := Ray{hit.Point, direction}
+	time := RandomFloat()
+	scattered := Ray{hit.Point, direction, time}
 	return true, scattered, l.Albedo
 }
 
@@ -26,7 +27,8 @@ type Metal struct {
 
 func (m Metal) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 	reflected := ray.Direction.Unit().Reflect(hit.Normal).Add(RandomVec3InUnitSphere().MulScalar(m.Fuzz))
-	scattered := Ray{hit.Point, reflected}
+	time := RandomFloat()
+	scattered := Ray{hit.Point, reflected, time}
 	return scattered.Direction.Dot(hit.Normal) > 0, scattered, m.Albedo
 }
 
@@ -52,7 +54,8 @@ func (d Dielectric) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 		direction = unitDirection.Refract(hit.Normal, ri)
 	}
 
-	scattered := Ray{hit.Point, direction}
+	time := RandomFloat()
+	scattered := Ray{hit.Point, direction, time}
 	return true, scattered, attenuation
 }
 

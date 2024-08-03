@@ -3,13 +3,35 @@ package main
 import "math"
 
 type Sphere struct {
-	Center   Vec3
-	Radius   float64
-	Material Material
+	IsMoving    bool
+	CenterInit  Vec3
+	CenterFinal Vec3
+	Radius      float64
+	Material    Material
+}
+
+func NewStationarySphere(center Vec3, radius float64, material Material) Sphere {
+	return Sphere{
+		IsMoving:    false,
+		CenterInit:  center,
+		CenterFinal: center,
+		Radius:      radius,
+		Material:    material,
+	}
+}
+
+func NewMovingSphere(centerInit, centerFinal Vec3, radius float64, material Material) Sphere {
+	return Sphere{
+		IsMoving:    true,
+		CenterInit:  centerInit,
+		CenterFinal: centerFinal,
+		Radius:      radius,
+		Material:    material,
+	}
 }
 
 func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
-	oc := r.Origin.Sub(s.Center)
+	oc := r.Origin.Sub(s.Center(r.Time))
 	a := r.Direction.LengthSquared()
 	h := oc.Dot(r.Direction)
 	c := oc.LengthSquared() - s.Radius*s.Radius
@@ -30,7 +52,7 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	}
 
 	point := r.PointAt(root)
-	normal := point.Sub(s.Center).DivScalar(s.Radius)
+	normal := point.Sub(s.Center(r.Time)).DivScalar(s.Radius)
 	normal, frontFace := s.CalculateFaceNormal(r, normal)
 	hitInfo := HitInfo{
 		Point:     point,
@@ -48,4 +70,11 @@ func (s Sphere) CalculateFaceNormal(r Ray, outwardNormal Vec3) (Vec3, bool) {
 		outwardNormal = outwardNormal.Neg()
 	}
 	return outwardNormal, frontFace
+}
+
+func (s Sphere) Center(time float64) Vec3 {
+	if !s.IsMoving {
+		return s.CenterInit
+	}
+	return s.CenterInit.Add(s.CenterFinal.Sub(s.CenterInit).MulScalar(time))
 }

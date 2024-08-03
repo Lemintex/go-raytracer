@@ -5,6 +5,7 @@ import "math"
 type Ray struct {
 	Origin    Vec3
 	Direction Vec3
+	Time      float64
 }
 
 func (r Ray) PointAt(t float64) Vec3 {
@@ -22,7 +23,8 @@ func (r Ray) Color(world HittableList, bounce int) Vec3 {
 			return scattered.Color(world, bounce-1).Mul(attenuation)
 		}
 		direction := hit.Normal.Add(RandomUnitVec3())
-		r := Ray{hit.Point, direction}
+		time := RandomFloat()
+		r := Ray{hit.Point, direction, time}
 		return r.Color(world, bounce-1).MulScalar(0.5)
 	}
 	unitDir := r.Direction.Unit()
@@ -40,7 +42,8 @@ func GetRay(c Camera, x, y int) Ray {
 		rayOrigin = DefocusDiskSample(c)
 	}
 	rayDirection := pixelSample.Sub(rayOrigin)
-	return Ray{rayOrigin, rayDirection}
+	time := RandomFloat()
+	return Ray{rayOrigin, rayDirection, time}
 }
 
 func DefocusDiskSample(c Camera) Vec3 {

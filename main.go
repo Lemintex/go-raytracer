@@ -30,7 +30,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image21.ppm")
+	f, err := os.Create("images/Book 2/image1.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -69,13 +69,13 @@ func CreateScene() {
 				material = Dielectric{1.5}
 			}
 			center := Vec3{1.5*float64(a) + 0.9*RandomFloat(), size, 1.5*float64(b) + 0.9*RandomFloat()}
-			world.Add(Sphere{center, size, material})
+			world.Add(NewMovingSphere(center, center.Add(Vec3{0, 1, 0}), size, material))
 		}
 	}
 
-	world.Add(Sphere{Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}}})
-	world.Add(Sphere{Vec3{0, .75, 0}, .75, Dielectric{1.5}})
-	world.Add(Sphere{Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}})
-	world.Add(Sphere{Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}}})
-	world.Add(Sphere{Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}})
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}}))
+	world.Add(NewStationarySphere(Vec3{0, .75, 0}, .75, Dielectric{1.5}))
+	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
+	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}}))
+	world.Add(NewStationarySphere(Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
 }
