@@ -30,7 +30,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/Book 2/image1.ppm")
+	f, err := os.Create("images/Book 2/image2.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -69,7 +69,7 @@ func CreateScene() {
 				material = Dielectric{1.5}
 			}
 			center := Vec3{1.5*float64(a) + 0.9*RandomFloat(), size, 1.5*float64(b) + 0.9*RandomFloat()}
-			world.Add(NewMovingSphere(center, center.Add(Vec3{0, 1, 0}), size, material))
+			world.Add(NewMovingSphere(center, center.Add(Vec3{0, 0.5, 0}), size, material))
 		}
 	}
 
