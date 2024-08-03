@@ -51,7 +51,7 @@ func (c *Camera) Initialize() {
 	c.VUp = Vec3{0, 1, 0}
 
 	// defocus blur
-	c.DefocusAngle = 1
+	c.DefocusAngle = 0
 	c.FocusDistance = 3.4
 
 	// image info
@@ -60,7 +60,7 @@ func (c *Camera) Initialize() {
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 100
+	c.SamplesPerPixel = 10
 	c.FocalLength = c.LookFrom.Sub(c.LookAt).Length()
 
 	// camera coordinate frame
