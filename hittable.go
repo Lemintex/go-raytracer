@@ -10,4 +10,5 @@ type HitInfo struct {
 
 type Hittable interface {
 	Hit(r Ray, i Interval) (bool, HitInfo)
+	BoundingBox() AABB
 }

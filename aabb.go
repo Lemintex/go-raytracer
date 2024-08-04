@@ -26,6 +26,17 @@ func NewAABBFromPoints(a, b Vec3) AABB {
 	return aabb
 }
 
+func NewAABBFromAABB(a, b AABB) AABB {
+	xMin, xMax := NewInterval(a.X, b.X)
+	yMin, yMax := NewInterval(a.Y, b.Y)
+	zMin, zMax := NewInterval(a.Z, b.Z)
+	return AABB{
+		X: Interval{xMin, xMax},
+		Y: Interval{yMin, yMax},
+		Z: Interval{zMin, zMax},
+	}
+}
+
 func (aabb AABB) AxisInterval(axis int) Interval {
 	switch axis {
 	case 0:

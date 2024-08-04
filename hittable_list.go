@@ -2,10 +2,12 @@ package main
 
 type HittableList struct {
 	Objects []Hittable
+	AABB    AABB
 }
 
 func (hl *HittableList) Add(h Hittable) {
 	hl.Objects = append(hl.Objects, h)
+	hl.AABB = NewAABBFromAABB(hl.AABB, h.BoundingBox())
 }
 
 func (hl *HittableList) Clear() {

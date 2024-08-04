@@ -8,25 +8,34 @@ type Sphere struct {
 	CenterFinal Vec3
 	Radius      float64
 	Material    Material
+	AABB        AABB
 }
 
 func NewStationarySphere(center Vec3, radius float64, material Material) Sphere {
+	radiusVec := Vec3{radius, radius, radius}
+	aabb := NewAABBFromPoints(center.Sub(radiusVec), center.Add(radiusVec))
 	return Sphere{
 		IsMoving:    false,
 		CenterInit:  center,
 		CenterFinal: center,
 		Radius:      radius,
 		Material:    material,
+		AABB:        aabb,
 	}
 }
 
 func NewMovingSphere(centerInit, centerFinal Vec3, radius float64, material Material) Sphere {
+	radiusVec := Vec3{radius, radius, radius}
+	box1 := NewAABBFromPoints(centerInit.Sub(radiusVec), centerInit.Add(radiusVec))
+	box2 := NewAABBFromPoints(centerFinal.Sub(radiusVec), centerFinal.Add(radiusVec))
+	bbox := NewAABBFromAABB(box1, box2)
 	return Sphere{
 		IsMoving:    true,
 		CenterInit:  centerInit,
 		CenterFinal: centerFinal,
 		Radius:      radius,
 		Material:    material,
+		AABB:        bbox,
 	}
 }
 
@@ -77,4 +86,8 @@ func (s Sphere) Center(time float64) Vec3 {
 		return s.CenterInit
 	}
 	return s.CenterInit.Add(s.CenterFinal.Sub(s.CenterInit).MulScalar(time))
+}
+
+func (s Sphere) BoundingBox() AABB {
+	return s.AABB
 }
