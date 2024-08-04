@@ -25,3 +25,6 @@ func (i Interval) Clamp(x float64) float64 {
 	}
 	return x
 }
+func (i Interval) Expand(x float64) Interval {
+	return Interval{i.Min - x, i.Max + x}
+}
