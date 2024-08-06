@@ -38,6 +38,7 @@ func (n BvhNode) NewBvhNode(aaab []Hittable, start, end int) BvhNode {
 		n.Right = n.NewBvhNode(aaab, mid, end)
 	}
 	n.AABB = NewAABBFromAABB(n.Left.BoundingBox(), n.Right.BoundingBox())
+	return n
 }
 
 func (node BvhNode) Hit(r Ray, i Interval) (bool, HitInfo) {
