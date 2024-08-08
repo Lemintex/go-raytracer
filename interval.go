@@ -40,6 +40,7 @@ func (i Interval) Clamp(x float64) float64 {
 	}
 	return x
 }
-func (i Interval) Expand(x float64) Interval {
-	return Interval{i.Min - x, i.Max + x}
+func (i Interval) Expand(delta float64) Interval {
+	padding := delta / 2
+	return Interval{i.Min - padding, i.Max + padding}
 }
