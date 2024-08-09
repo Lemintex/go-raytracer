@@ -53,6 +53,7 @@ func main() {
 }
 
 func CreateScene() {
+	defer world.BuildBVH()
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			if math.Abs(float64(a)) <= 2 && math.Abs(float64(b)) <= 2 {

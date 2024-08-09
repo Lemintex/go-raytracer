@@ -16,3 +16,7 @@ func RandomFloatBetweenMinAndMax(min, max float64) float64 {
 func RandomFloat() float64 {
 	return rand.Float64()
 }
+
+func RandomIntBetweenMinAndMax(min, max int) int {
+	return int(RandomFloatBetweenMinAndMax(float64(min), float64(max+1)))
+}

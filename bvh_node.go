@@ -46,17 +46,34 @@ func (node BvhNode) Hit(r Ray, i Interval) (bool, HitInfo) {
 		return false, HitInfo{}
 	}
 	var hitLeft, hitRight bool
+	hitInfo := HitInfo{}
 	if node.Left != nil {
-		hitLeft, _ = node.Left.Hit(r, i)
+		hitLeft, hitInfo = node.Left.Hit(r, i)
 	}
 
 	if node.Right != nil {
-		hitRight, _ = node.Right.Hit(r, i)
+		var temp float64
+		var tempHitInfo HitInfo
+		if hitLeft {
+			temp = hitInfo.T
+		} else {
+			temp = i.Max
+		}
+		hitRight, tempHitInfo = node.Right.Hit(r, Interval{i.Min, temp})
+		if hitRight {
+			hitInfo = tempHitInfo
+		}
 	}
 
-	return hitLeft || hitRight, HitInfo{}
+	return hitLeft || hitRight, hitInfo
 }
 
+func (n BvhNode) BoxCompare(a, b Hittable, axisIndex int) bool {
+	aAxisInterval := a.BoundingBox().AxisInterval(axisIndex)
+	bAxisInterval := b.BoundingBox().AxisInterval(axisIndex)
+	return aAxisInterval.Min < bAxisInterval.Min
+
+}
 func (n BvhNode) BoxCompareX(a, b Hittable) bool {
 	boxA := a.BoundingBox()
 	boxB := b.BoundingBox()
