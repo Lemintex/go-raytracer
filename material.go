@@ -8,6 +8,7 @@ type Material interface {
 
 type Lambertian struct {
 	Albedo Vec3
+	Tex    Texture
 }
 
 func (l Lambertian) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
@@ -16,7 +17,11 @@ func (l Lambertian) Scatter(ray Ray, hit HitInfo) (bool, Ray, Vec3) {
 		direction = hit.Normal
 	}
 	scattered := Ray{hit.Point, direction, ray.Time}
-	return true, scattered, l.Albedo
+	color := l.Albedo
+	if l.Tex != nil {
+		color = l.Tex.Value(hit.U, hit.V, hit.Point)
+	}
+	return true, scattered, color
 }
 
 type Metal struct {

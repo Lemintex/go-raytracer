@@ -5,6 +5,8 @@ type HitInfo struct {
 	Normal    Vec3
 	Material  Material
 	T         float64
+	U         float64
+	V         float64
 	FrontFace bool
 }
 

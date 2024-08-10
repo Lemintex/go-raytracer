@@ -30,7 +30,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/Book 2/image2.ppm")
+	f, err := os.Create("images/Book 2/image3.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -63,7 +63,7 @@ func CreateScene() {
 			randomMat := RandomFloat()
 			var material Material
 			if randomMat < 0.8 {
-				material = Lambertian{Vec3{RandomFloat(), RandomFloat(), RandomFloat()}}
+				material = Lambertian{Vec3{RandomFloat(), RandomFloat(), RandomFloat()}, nil}
 			} else if randomMat < 0.95 {
 				material = Metal{Vec3{0.5 * (1 + RandomFloat()), 0.5 * (1 + RandomFloat()), 0.5 * (1 + RandomFloat())}, 0.5 * RandomFloat()}
 			} else {
@@ -74,9 +74,9 @@ func CreateScene() {
 		}
 	}
 
-	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}}))
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.32, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{1, 1, 1}}}}))
 	world.Add(NewStationarySphere(Vec3{0, .75, 0}, .75, Dielectric{1.5}))
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
-	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}}))
+	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}, nil}))
 	world.Add(NewStationarySphere(Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
 }
