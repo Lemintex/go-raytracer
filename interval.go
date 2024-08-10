@@ -4,6 +4,21 @@ type Interval struct {
 	Min, Max float64
 }
 
+func NewInterval(a, b Interval) (float64, float64) {
+	var min, max float64
+	if a.Min < b.Min {
+		min = a.Min
+	} else {
+		min = b.Min
+	}
+	if a.Max > b.Max {
+		max = a.Max
+	} else {
+		max = b.Max
+	}
+	return min, max
+}
+
 func (i Interval) Size() float64 {
 	return i.Max - i.Min
 }
@@ -24,4 +39,8 @@ func (i Interval) Clamp(x float64) float64 {
 		return i.Max
 	}
 	return x
+}
+func (i Interval) Expand(delta float64) Interval {
+	padding := delta / 2
+	return Interval{i.Min - padding, i.Max + padding}
 }

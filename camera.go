@@ -60,7 +60,7 @@ func (c *Camera) Initialize() {
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 10
+	c.SamplesPerPixel = 50
 	c.FocalLength = c.LookFrom.Sub(c.LookAt).Length()
 
 	// camera coordinate frame
