@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/rand"
 	"sort"
 )
 
@@ -11,8 +10,11 @@ type BvhNode struct {
 }
 
 func (n BvhNode) NewBvhNode(aaab []Hittable, start, end int) BvhNode {
-	///TODO: Implement this
-	axis := rand.Intn(3)
+	bbox := AABB{}
+	for i := start; i < end; i++ {
+		bbox = NewAABBFromAABB(bbox, aaab[i].BoundingBox())
+	}
+	axis := bbox.LongestAxis()
 	var comparator func(a, b Hittable) bool
 	if axis == 0 {
 		comparator = n.BoxCompareX

@@ -91,3 +91,15 @@ func (aabb AABB) Hit(r Ray, i Interval) bool {
 	}
 	return true
 }
+
+func (aabb AABB) LongestAxis() int {
+	xSpan := aabb.X.Max - aabb.X.Min
+	ySpan := aabb.Y.Max - aabb.Y.Min
+	zSpan := aabb.Z.Max - aabb.Z.Min
+	if xSpan > ySpan && xSpan > zSpan {
+		return 0
+	} else if ySpan > zSpan {
+		return 1
+	}
+	return 2
+}
