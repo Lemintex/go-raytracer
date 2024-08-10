@@ -39,7 +39,7 @@ func (n BvhNode) NewBvhNode(aaab []Hittable, start, end int) BvhNode {
 		n.Left = n.NewBvhNode(aaab, start, mid)
 		n.Right = n.NewBvhNode(aaab, mid, end)
 	}
-	n.AABB = NewAABBFromAABB(n.Left.BoundingBox(), n.Right.BoundingBox())
+	n.AABB = bbox
 	return n
 }
 
