@@ -107,9 +107,9 @@ func BouncingSpheres() {
 
 // temporary
 func CheckeredSpheres() {
-	checker := CheckerTexture{0.3, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{0.9, 0.9, 0.9}}}
+	checker := CheckerTexture{0.2, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{0.9, 0.9, 0.9}}}
 
-	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.8, SolidColor{Vec3{0.6, 0.2, 0.3}}, SolidColor{Vec3{1, 1, 1}}}}))
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.2, SolidColor{Vec3{0.6, 0.2, 0.3}}, SolidColor{Vec3{1, 1, 1}}}}))
 	world.Add(NewStationarySphere(Vec3{0, .75, 0}, .75, Dielectric{1.5}))
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
 	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}, checker}))
