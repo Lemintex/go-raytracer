@@ -14,7 +14,7 @@ type ImageLine struct {
 	Pixels     []Color
 }
 
-const SCENE_COUNT = 2
+const SCENE_COUNT = 3
 
 var world HittableList
 
@@ -41,7 +41,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/Book 2/image4.ppm")
+	f, err := os.Create("images/Book 2/image5.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -71,6 +71,9 @@ func CreateScene(scene *int) {
 
 	case 2:
 		CheckeredSpheres()
+
+	case 3:
+		Earth()
 	}
 }
 
@@ -111,4 +114,13 @@ func CheckeredSpheres() {
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
 	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}, checker}))
 	world.Add(NewStationarySphere(Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
+}
+
+func Earth() {
+	img, err := ReadImage("images/input/earthmap.jpg")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	world.Add(NewStationarySphere(Vec3{0, 0, 0}, 2, Lambertian{Vec3{1, 1, 1}, ImageTexture{img}}))
 }

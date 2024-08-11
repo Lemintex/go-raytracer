@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"math"
 )
 
@@ -32,4 +33,19 @@ func (c CheckerTexture) Value(u, v float64, p Vec3) Vec3 {
 	} else {
 		return c.Odd.Value(u, v, p)
 	}
+}
+
+type ImageTexture struct {
+	img image.Image
+}
+
+func (i ImageTexture) Value(u, v float64, p Vec3) Vec3 {
+	if i.img == nil {
+		return Vec3{1, 0, 1}
+	}
+	bounds := i.img.Bounds()
+	x := int(u * float64(bounds.Max.X))
+	y := int((1 - v) * float64(bounds.Max.Y))
+	r, g, b, _ := i.img.At(x, y).RGBA()
+	return Vec3{float64(r) / 65535, float64(g) / 65535, float64(b) / 65535}
 }
