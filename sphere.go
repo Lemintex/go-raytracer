@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 type Sphere struct {
 	IsMoving    bool
@@ -63,11 +65,14 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	point := r.PointAt(root)
 	normal := point.Sub(s.Center(r.Time)).DivScalar(s.Radius)
 	normal, frontFace := s.CalculateFaceNormal(r, normal)
+	u, v := GetSphereUV(normal)
 	hitInfo := HitInfo{
 		Point:     point,
 		Normal:    normal,
 		Material:  s.Material,
 		T:         root,
+		U:         u,
+		V:         v,
 		FrontFace: frontFace,
 	}
 	return true, hitInfo
@@ -90,4 +95,12 @@ func (s Sphere) Center(time float64) Vec3 {
 
 func (s Sphere) BoundingBox() AABB {
 	return s.AABB
+}
+
+func GetSphereUV(p Vec3) (float64, float64) {
+	phi := math.Atan2(p.Z, p.X)
+	theta := math.Asin(p.Y)
+	u := 1 - (phi+math.Pi)/(2*math.Pi)
+	v := (theta + math.Pi/2) / math.Pi
+	return u, v
 }
