@@ -44,16 +44,6 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	return image
 }
 func (c *Camera) Initialize() {
-	// camera position
-	c.LookFrom = Vec3{3, 3, -1}
-	c.Origin = c.LookFrom
-	c.LookAt = Vec3{0, 1, 0}
-	c.VUp = Vec3{0, 1, 0}
-
-	// defocus blur
-	c.DefocusAngle = 0
-	c.FocusDistance = 3.4
-
 	// image info
 	c.AspectRatio = 16.0 / 9.0
 	c.ImageWidth = 1920
@@ -102,4 +92,47 @@ func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGr
 		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
+}
+
+// custom camera configurations for each scene
+func (c *Camera) SetupCameraForScene(scene int) {
+	defer c.Initialize()
+	switch scene {
+	case 1:
+		// camera position
+		c.LookFrom = Vec3{3, 3, -1}
+		c.LookAt = Vec3{0, 1, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
+
+		// FOV
+		c.ViewportFOV = 20
+	case 2:
+		// camera position
+		c.LookFrom = Vec3{3, 2, 0}
+		c.LookAt = Vec3{0, 1, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0.1
+		c.FocusDistance = 10
+
+		// FOV
+	case 3:
+		// camera position
+		c.LookFrom = Vec3{4, 2, 3}
+		c.LookAt = Vec3{0, 0, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.FocusDistance = 10
+		c.DefocusAngle = 0.1
+
+		// FOV
+		c.ViewportFOV = 40
+	}
+	c.Origin = c.LookFrom
 }

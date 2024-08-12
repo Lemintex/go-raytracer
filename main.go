@@ -34,7 +34,7 @@ func main() {
 
 	// camera
 	cam := Camera{}
-	cam.Initialize()
+	cam.SetupCameraForScene(*scene)
 
 	image := make([]ImageLine, cam.ImageHeight)
 	for y := range cam.ImageHeight {
