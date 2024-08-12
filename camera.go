@@ -117,19 +117,21 @@ func (c *Camera) SetupCameraForScene(scene int) {
 		c.VUp = Vec3{0, 1, 0}
 
 		// defocus blur
-		c.DefocusAngle = 0.1
-		c.FocusDistance = 10
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
 
 		// FOV
+		c.ViewportFOV = 40
 	case 3:
 		// camera position
-		c.LookFrom = Vec3{4, 2, 3}
-		c.LookAt = Vec3{0, 0, 0}
+		c.LookFrom = Vec3{3, 3, -1}
+		c.Origin = c.LookFrom
+		c.LookAt = Vec3{0, 1, 0}
 		c.VUp = Vec3{0, 1, 0}
 
 		// defocus blur
-		c.FocusDistance = 10
-		c.DefocusAngle = 0.1
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
 
 		// FOV
 		c.ViewportFOV = 40
