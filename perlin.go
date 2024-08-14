@@ -44,7 +44,7 @@ func (p Perlin) Turb(v Vec3, depth int) float64 {
 	accum := 0.0
 	tempV := v
 	weight := 1.0
-	for i := 0; i < depth; i++ {
+	for range depth {
 		accum += weight * p.Noise(tempV)
 		weight *= 0.5
 		tempV = tempV.MulScalar(2)
