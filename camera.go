@@ -148,6 +148,19 @@ func (c *Camera) SetupCameraForScene(scene int) {
 		// FOV
 		c.ViewportFOV = 20
 
+	case 5:
+		// camera position
+		c.LookFrom = Vec3{0, 0, 9}
+		c.LookAt = Vec3{0, 0, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 10
+
+		// FOV
+		c.ViewportFOV = 80
+
 	}
 	c.Origin = c.LookFrom
 }
