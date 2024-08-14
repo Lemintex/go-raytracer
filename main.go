@@ -41,7 +41,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/Book 2/image10.ppm")
+	f, err := os.Create("images/Book 2/image11.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -131,7 +131,7 @@ func Earth() {
 func PerlinNoise() {
 	perlin := NewPerlin()
 	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{perlin, 7}}))
-	world.Add(NewStationarySphere(Vec3{0, 2, 0}, 2, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{NewPerlin(), 15}}))
+	world.Add(NewStationarySphere(Vec3{0, 2, 0}, 2, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{NewPerlin(), 30}}))
 
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
 }

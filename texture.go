@@ -56,5 +56,5 @@ type NoiseTexture struct {
 }
 
 func (n NoiseTexture) Value(u, v float64, p Vec3) Vec3 {
-	return Vec3{1, 1, 1}.MulScalar(n.Noise.Turb(p, 7))
+	return Vec3{0.5, 0.5, 0.5}.MulScalar(1 + math.Sin(n.Scale*p.Z+10*n.Noise.Turb(p, 7)))
 }
