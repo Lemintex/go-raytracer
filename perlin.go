@@ -25,6 +25,7 @@ func NewPerlin() Perlin {
 
 func (p Perlin) Noise(vec Vec3) float64 {
 	u, v, w := vec.X-math.Floor(vec.X), vec.Y-math.Floor(vec.Y), vec.Z-math.Floor(vec.Z)
+	u, v, w = u*u*(3-2*u), v*v*(3-2*v), w*w*(3-2*w)
 	i, j, k := int(math.Floor(vec.X)), int(math.Floor(vec.Y)), int(math.Floor(vec.Z))
 	c := make([][][]float64, 2)
 	for di := 0; di < 2; di++ {
