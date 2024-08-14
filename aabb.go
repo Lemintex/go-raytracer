@@ -23,6 +23,7 @@ func NewAABBFromPoints(a, b Vec3) AABB {
 	} else {
 		aabb.Z = Interval{b.Z, a.Z}
 	}
+	aabb.AddPadding()
 	return aabb
 }
 
@@ -102,4 +103,18 @@ func (aabb AABB) LongestAxis() int {
 		return 1
 	}
 	return 2
+}
+
+// make the bounding box wider if it is too skinny
+func (aabb *AABB) AddPadding() {
+	delta := 0.00001
+	if aabb.X.Size() < delta {
+		aabb.X.Expand(delta)
+	}
+	if aabb.Y.Size() < delta {
+		aabb.Y.Expand(delta)
+	}
+	if aabb.Z.Size() < delta {
+		aabb.Z.Expand(delta)
+	}
 }
