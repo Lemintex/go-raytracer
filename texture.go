@@ -49,3 +49,12 @@ func (i ImageTexture) Value(u, v float64, p Vec3) Vec3 {
 	r, g, b, _ := i.img.At(x, y).RGBA()
 	return Vec3{float64(r) / 65535, float64(g) / 65535, float64(b) / 65535}
 }
+
+type NoiseTexture struct {
+	Noise Perlin
+	Scale float64
+}
+
+func (n NoiseTexture) Value(u, v float64, p Vec3) Vec3 {
+	return Vec3{0.5, 0.5, 0.5}.MulScalar(1 + math.Sin(n.Scale*p.Z+10*n.Noise.Turb(p, 7)))
+}
