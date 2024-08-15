@@ -140,6 +140,7 @@ func PerlinNoise() {
 }
 
 func Quads() {
-	world.Add(NewQuad(Vec3{-3, -2, 5}, Vec3{0, 0, 4}, Vec3{0, 4, 0}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
-
+	world.Add(NewQuad(Vec3{1, 0, -1}, Vec3{0, 4, 4}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{-1, 0, -1}, Vec3{0, 4, 4}, Vec3{4, 4, 0}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{0, 1, -1}, Vec3{4, 4, 0}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
 }

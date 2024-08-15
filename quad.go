@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -19,66 +18,58 @@ type Quad struct {
 func NewQuad(Q, U, V Vec3, Materal Material) Quad {
 	n := U.Cross(V)
 	Normal := n.Unit()
-	D := Q.Dot(Normal)
-	W := n.DivScalar(n.Dot(n))
+	D := Normal.Dot(Q)
+	W := n.DivScalar(n.Length())
 	q := Quad{
 		Q:        Q,
 		U:        U,
 		V:        V,
 		W:        W,
-		D:        D,
 		Normal:   Normal,
+		D:        D,
 		Material: Materal,
 	}
+	q.SetAABB()
 	return q
 }
 
 func (q *Quad) SetAABB() {
-	diag1 := NewAABBFromPoints(q.Q, q.Q.Add(q.U).Add(q.V))
-	diag2 := NewAABBFromPoints(q.Q.Add(q.U), q.Q.Add(q.V))
-	q.AABB = NewAABBFromAABB(diag1, diag2)
+	d1 := NewAABBFromPoints(q.Q, q.Q.Add(q.U).Add(q.V))
+	d2 := NewAABBFromPoints(q.Q.Add(q.U), q.Q.Add(q.V))
+	q.AABB = NewAABBFromAABB(d1, d2)
 }
 
 func (q Quad) Hit(r Ray, i Interval) (bool, HitInfo) {
-	denominator := q.Normal.Dot(r.Direction)
-	if math.Abs(denominator) < 0.0000001 {
-		fmt.Println("denominator", denominator)
+	denom := q.Normal.Dot(r.Direction)
+	if math.Abs(denom) < 0.0001 {
 		return false, HitInfo{}
 	}
-	t := q.D - q.Normal.Dot(r.Direction)/denominator
-
-	if i.Contains(t) {
-		fmt.Println("t", t)
+	t := (q.D - q.Normal.Dot(r.Origin)) / denom
+	if !i.Contains(t) {
 		return false, HitInfo{}
 	}
-	intersection := r.PointAt(t)
-	planarHitpoint := intersection.Sub(q.Q)
-	alpha, beta := q.W.Dot(planarHitpoint.Cross(q.V)), q.W.Dot(q.U.Cross(planarHitpoint))
-	normal, frontFace := CalculateFaceNormal(r, q.Normal)
-
-	fmt.Println(alpha, beta)
-	if !IsInterior(alpha, beta) {
+	p := r.PointAt(t)
+	du := p.Sub(q.Q)
+	u := du.Dot(q.U)
+	if u < 0 || u > q.U.Length() {
 		return false, HitInfo{}
 	}
-	hitInfo := HitInfo{
-		Point:     intersection,
-		T:         t,
-		Material:  q.Material,
-		Normal:    normal,
-		U:         alpha,
-		V:         beta,
-		FrontFace: frontFace,
+	dv := p.Sub(q.Q)
+	v := dv.Dot(q.V)
+	if v < 0 || v > q.V.Length() {
+		return false, HitInfo{}
 	}
-	return true, hitInfo
+	return true, HitInfo{
+		T:        t,
+		Point:    p,
+		Normal:   q.Normal,
+		Material: q.Material,
+	}
 }
 func (q Quad) BoundingBox() AABB {
 	return q.AABB
 }
 
 func IsInterior(a, b float64) bool {
-	unitInterval := Interval{Min: 0, Max: 1}
-	if !unitInterval.Contains(a) || !unitInterval.Contains(b) {
-		return false
-	}
-	return true
+	return a > 0 && b > 0 || a < 0 && b < 0
 }

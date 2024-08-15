@@ -88,7 +88,6 @@ func (aabb AABB) Hit(r Ray, i Interval) bool {
 		if i.Max <= i.Min {
 			return false
 		}
-
 	}
 	return true
 }
