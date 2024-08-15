@@ -139,6 +139,7 @@ func PerlinNoise() {
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
 }
 
+// i am not touching this
 func Quads() {
 	world.Add(NewQuad(Vec3{1, 0, -1}, Vec3{0, 4, 4}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
 	world.Add(NewQuad(Vec3{-1, 0, -1}, Vec3{0, 4, 4}, Vec3{4, 4, 0}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
