@@ -38,7 +38,7 @@ func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		go c.ProcessLine(world, &image[y], &wg)
+		c.ProcessLine(world, &image[y], &wg)
 	}
 	wg.Wait()
 	return image
@@ -50,7 +50,7 @@ func (c *Camera) Initialize() {
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 50
+	c.SamplesPerPixel = 5
 	c.FocalLength = c.LookFrom.Sub(c.LookAt).Length()
 
 	// camera coordinate frame
@@ -148,6 +148,21 @@ func (c *Camera) SetupCameraForScene(scene int) {
 		// FOV
 		c.ViewportFOV = 20
 
+	case 5:
+		// camera position
+		c.LookFrom = Vec3{0, 0, 3}
+		c.LookAt = Vec3{0, 0, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 10
+
+		// FOV
+		c.ViewportFOV = 80
+
+		//aspect ratio
+		c.AspectRatio = 1.0
 	}
 	c.Origin = c.LookFrom
 }

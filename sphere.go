@@ -64,7 +64,7 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 
 	point := r.PointAt(root)
 	normal := point.Sub(s.Center(r.Time)).DivScalar(s.Radius)
-	normal, frontFace := s.CalculateFaceNormal(r, normal)
+	normal, frontFace := CalculateFaceNormal(r, normal)
 	u, v := GetSphereUV(normal)
 	hitInfo := HitInfo{
 		Point:     point,
@@ -78,7 +78,7 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	return true, hitInfo
 }
 
-func (s Sphere) CalculateFaceNormal(r Ray, outwardNormal Vec3) (Vec3, bool) {
+func CalculateFaceNormal(r Ray, outwardNormal Vec3) (Vec3, bool) {
 	frontFace := r.Direction.Dot(outwardNormal) < 0
 	if !frontFace {
 		outwardNormal = outwardNormal.Neg()

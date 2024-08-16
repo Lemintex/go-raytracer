@@ -14,7 +14,7 @@ type ImageLine struct {
 	Pixels     []Color
 }
 
-const SCENE_COUNT = 4
+const SCENE_COUNT = 5
 
 var world HittableList
 
@@ -41,7 +41,7 @@ func main() {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/Book 2/image11.ppm")
+	f, err := os.Create("images/Book 2/image12.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -77,6 +77,9 @@ func CreateScene(scene *int) {
 
 	case 4:
 		PerlinNoise()
+
+	case 5:
+		Quads()
 	}
 }
 
@@ -134,4 +137,11 @@ func PerlinNoise() {
 	world.Add(NewStationarySphere(Vec3{0, 2, 0}, 2, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{NewPerlin(), 30}}))
 
 	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
+}
+
+// i am not touching this
+func Quads() {
+	world.Add(NewQuad(Vec3{1, 0, -1}, Vec3{0, 4, 4}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{-1, 0, -1}, Vec3{0, 4, 4}, Vec3{4, 4, 0}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{0, 1, -1}, Vec3{4, 4, 0}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
 }
