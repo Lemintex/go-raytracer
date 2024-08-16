@@ -12,24 +12,24 @@ func (r Ray) PointAt(t float64) Vec3 {
 	return r.Origin.Add(r.Direction.MulScalar(t))
 }
 
-func (r Ray) Color(world HittableList, bounce int) Vec3 {
+func (r Ray) Color(world HittableList, c Camera, bounce int) Vec3 {
 	if bounce == 0 {
 		return Vec3{0, 0, 0}
 	}
 	didHit, hit := world.Hit(r, Interval{0.00001, math.Inf(1)})
-	if didHit {
-		didScatter, scattered, attenuation := hit.Material.Scatter(r, hit)
-		if didScatter {
-			return scattered.Color(world, bounce-1).Mul(attenuation)
-		}
-		direction := hit.Normal.Add(RandomUnitVec3())
-		time := RandomFloat()
-		r := Ray{hit.Point, direction, time}
-		return r.Color(world, bounce-1).MulScalar(0.5)
+	if !didHit {
+		return c.Background
 	}
-	unitDir := r.Direction.Unit()
-	a := 0.5 * (unitDir.Y + 1.0)
-	return Vec3{1.0, 1.0, 1.0}.MulScalar(1.0 - a).Add(Vec3{0.5, 0.7, 1.0}.MulScalar(a))
+	emitted := hit.Material.Emitted(hit.U, hit.V, hit.Point)
+
+	didScatter, scattered, attenuation := hit.Material.Scatter(r, hit)
+	if !didScatter {
+		if emitted.X != 0 || emitted.Y != 0 || emitted.Z != 0 {
+			return emitted
+		}
+	}
+	scatterCol := attenuation.Mul(scattered.Color(world, c, bounce-1))
+	return emitted.Add(scatterCol)
 }
 
 func GetRay(c Camera, x, y int) Ray {
