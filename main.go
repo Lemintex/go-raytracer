@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"math"
 	"os"
@@ -13,24 +14,34 @@ type ImageLine struct {
 	Pixels     []Color
 }
 
+const SCENE_COUNT = 6
+
 var world HittableList
 
 func main() {
 	start := time.Now()
 	world = HittableList{}
 
+	// flags
+	scene := flag.Int("scene", 1, "scene id")
+	flag.Parse()
+	if *scene < 1 || *scene > SCENE_COUNT {
+		*scene = 1
+	}
+
+	// scene
+	CreateScene(scene)
+
 	// camera
 	cam := Camera{}
-	cam.Initialize()
-
-	CreateScene()
+	cam.SetupCameraForScene(*scene)
 
 	image := make([]ImageLine, cam.ImageHeight)
 	for y := range cam.ImageHeight {
 		image[y].LineNumber = y
 		image[y].Pixels = make([]Color, cam.ImageWidth)
 	}
-	f, err := os.Create("images/image21.ppm")
+	f, err := os.Create("images/Book 2/image13.ppm")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -52,7 +63,30 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
-func CreateScene() {
+func CreateScene(scene *int) {
+	defer world.BuildBVH()
+	switch *scene {
+	case 1:
+		BouncingSpheres()
+
+	case 2:
+		CheckeredSpheres()
+
+	case 3:
+		Earth()
+
+	case 4:
+		PerlinNoise()
+
+	case 5:
+		Quads()
+
+	case 6:
+		SimpleLight()
+	}
+}
+
+func BouncingSpheres() {
 	for a := -11; a < 11; a++ {
 		for b := -11; b < 11; b++ {
 			if math.Abs(float64(a)) <= 2 && math.Abs(float64(b)) <= 2 {
@@ -62,20 +96,63 @@ func CreateScene() {
 			randomMat := RandomFloat()
 			var material Material
 			if randomMat < 0.8 {
-				material = Lambertian{Vec3{RandomFloat(), RandomFloat(), RandomFloat()}}
+				material = Lambertian{Vec3{RandomFloat(), RandomFloat(), RandomFloat()}, nil}
 			} else if randomMat < 0.95 {
 				material = Metal{Vec3{0.5 * (1 + RandomFloat()), 0.5 * (1 + RandomFloat()), 0.5 * (1 + RandomFloat())}, 0.5 * RandomFloat()}
 			} else {
 				material = Dielectric{1.5}
 			}
 			center := Vec3{1.5*float64(a) + 0.9*RandomFloat(), size, 1.5*float64(b) + 0.9*RandomFloat()}
-			world.Add(Sphere{center, size, material})
+			world.Add(NewMovingSphere(center, center.Add(Vec3{0, 0.5, 0}), size, material))
 		}
 	}
 
-	world.Add(Sphere{Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}}})
-	world.Add(Sphere{Vec3{0, .75, 0}, .75, Dielectric{1.5}})
-	world.Add(Sphere{Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}})
-	world.Add(Sphere{Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}}})
-	world.Add(Sphere{Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}})
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.32, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{1, 1, 1}}}}))
+	world.Add(NewStationarySphere(Vec3{0, .75, 0}, .75, Dielectric{1.5}))
+	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
+	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}, nil}))
+	world.Add(NewStationarySphere(Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
+}
+
+// temporary
+func CheckeredSpheres() {
+	checker := CheckerTexture{0.2, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{0.9, 0.9, 0.9}}}
+
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.2, SolidColor{Vec3{0.6, 0.2, 0.3}}, SolidColor{Vec3{1, 1, 1}}}}))
+	world.Add(NewStationarySphere(Vec3{0, .75, 0}, .75, Dielectric{1.5}))
+	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
+	world.Add(NewStationarySphere(Vec3{1, .75, 1}, .75, Lambertian{Vec3{0.4, 0.2, 0.1}, checker}))
+	world.Add(NewStationarySphere(Vec3{-1, .75, -1}, .75, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
+}
+
+func Earth() {
+	img, err := ReadImage("images/input/earthmap.jpg")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	world.Add(NewStationarySphere(Vec3{0, 0, 0}, 2, Lambertian{Vec3{1, 1, 1}, ImageTexture{img}}))
+}
+
+func PerlinNoise() {
+	perlin := NewPerlin()
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{perlin, 7}}))
+	world.Add(NewStationarySphere(Vec3{0, 2, 0}, 2, Lambertian{Vec3{0.5, 0.5, 0.5}, NoiseTexture{NewPerlin(), 30}}))
+
+	world.Add(NewStationarySphere(Vec3{0, .625, 0}, -0.5, Dielectric{1 / 1.5}))
+}
+
+// i am not touching this
+func Quads() {
+	world.Add(NewQuad(Vec3{1, 0, -1}, Vec3{0, 4, 4}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{-1, 0, -1}, Vec3{0, 4, 4}, Vec3{4, 4, 0}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+	world.Add(NewQuad(Vec3{0, 1, -1}, Vec3{4, 4, 0}, Vec3{0, 4, 4}, Lambertian{Vec3{1, 0.2, 0.2}, nil}))
+}
+
+func SimpleLight() {
+	world.Add(NewStationarySphere(Vec3{0, -1000, 0}, 1000, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.32, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{1, 1, 1}}}}))
+	world.Add(NewStationarySphere(Vec3{0, 2, 0}, 2, Lambertian{Vec3{0.5, 0.5, 0.5}, CheckerTexture{0.32, SolidColor{Vec3{0.2, 0.3, 0.1}}, SolidColor{Vec3{1, 1, 1}}}}))
+	world.Add(NewStationarySphere(Vec3{0, 7, 0}, 2, DiffuseLight{SolidColor{Vec3{4, 4, 4}}}))
+	world.Add(NewStationarySphere(Vec3{0, 7, 0}, 1.5, Lambertian{Vec3{0.4, 0.2, 0.1}, nil}))
+	world.Add(NewStationarySphere(Vec3{0, 7, 0}, 0.5, Metal{Vec3{0.7, 0.6, 0.5}, 0.0}))
 }

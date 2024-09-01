@@ -32,35 +32,27 @@ type Camera struct {
 	FocusDistance float64
 	DefocusDiskU  Vec3
 	DefocusDiskV  Vec3
+
+	Background Vec3
 }
 
 func (c *Camera) Render(image []ImageLine, world HittableList) []ImageLine {
 	wg := sync.WaitGroup{}
 	wg.Add(c.ImageHeight)
 	for y := range c.ImageHeight {
-		go c.ProcessLine(world, &image[y], &wg)
+		c.ProcessLine(world, &image[y], &wg)
 	}
 	wg.Wait()
 	return image
 }
 func (c *Camera) Initialize() {
-	// camera position
-	c.LookFrom = Vec3{3, 3, -1}
-	c.Origin = c.LookFrom
-	c.LookAt = Vec3{0, 1, 0}
-	c.VUp = Vec3{0, 1, 0}
-
-	// defocus blur
-	c.DefocusAngle = 1
-	c.FocusDistance = 3.4
-
 	// image info
 	c.AspectRatio = 16.0 / 9.0
 	c.ImageWidth = 1920
 	c.ImageHeight = int(float64(c.ImageWidth) / c.AspectRatio)
 
 	// camera info
-	c.SamplesPerPixel = 100
+	c.SamplesPerPixel = 50
 	c.FocalLength = c.LookFrom.Sub(c.LookAt).Length()
 
 	// camera coordinate frame
@@ -97,9 +89,102 @@ func (c Camera) ProcessLine(world HittableList, line *ImageLine, wg *sync.WaitGr
 		var pixelColor Vec3
 		for range c.SamplesPerPixel {
 			r := GetRay(c, x, line.LineNumber)
-			pixelColor = pixelColor.Add(r.Color(world, 25))
+			pixelColor = pixelColor.Add(r.Color(world, c, 25))
 		}
 		color := pixelColor.DivScalar(float64(c.SamplesPerPixel))
 		line.Pixels[x] = WriteColor(color.X, color.Y, color.Z)
 	}
+}
+
+// custom camera configurations for each scene
+func (c *Camera) SetupCameraForScene(scene int) {
+	defer c.Initialize()
+
+	c.Background = Vec3{1, 1, 1}
+	switch scene {
+	case 1:
+		// camera position
+		c.LookFrom = Vec3{3, 3, -1}
+		c.LookAt = Vec3{0, 1, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
+
+		// FOV
+		c.ViewportFOV = 20
+	case 2:
+		// camera position
+		c.LookFrom = Vec3{3, 2, 0}
+		c.LookAt = Vec3{0, 1, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
+
+		// FOV
+		c.ViewportFOV = 40
+	case 3:
+		// camera position
+		c.LookFrom = Vec3{3, 3, -1}
+		c.Origin = c.LookFrom
+		c.LookAt = Vec3{0, 1, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 3.4
+
+		// FOV
+		c.ViewportFOV = 40
+	case 4:
+		// camera position
+		c.LookFrom = Vec3{13, 2, 3}
+		c.LookAt = Vec3{0, 0, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 10
+
+		// FOV
+		c.ViewportFOV = 20
+
+	case 5:
+		// camera position
+		c.LookFrom = Vec3{0, 0, 3}
+		c.LookAt = Vec3{0, 0, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 10
+
+		// FOV
+		c.ViewportFOV = 80
+
+		//aspect ratio
+		c.AspectRatio = 1.0
+	case 6:
+		// camera position
+		c.LookFrom = Vec3{26, 3, 6}
+		c.LookAt = Vec3{0, 2, 0}
+		c.VUp = Vec3{0, 1, 0}
+
+		// defocus blur
+		c.DefocusAngle = 0
+		c.FocusDistance = 10
+
+		// FOV
+		c.ViewportFOV = 80
+
+		//aspect ratio
+		c.AspectRatio = 1.0
+
+		// background color
+		c.Background = Vec3{0, 0, 0}
+	}
+	c.Origin = c.LookFrom
 }

@@ -1,15 +1,48 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 type Sphere struct {
-	Center   Vec3
-	Radius   float64
-	Material Material
+	IsMoving    bool
+	CenterInit  Vec3
+	CenterFinal Vec3
+	Radius      float64
+	Material    Material
+	AABB        AABB
+}
+
+func NewStationarySphere(center Vec3, radius float64, material Material) Sphere {
+	radiusVec := Vec3{radius, radius, radius}
+	aabb := NewAABBFromPoints(center.Sub(radiusVec), center.Add(radiusVec))
+	return Sphere{
+		IsMoving:    false,
+		CenterInit:  center,
+		CenterFinal: center,
+		Radius:      radius,
+		Material:    material,
+		AABB:        aabb,
+	}
+}
+
+func NewMovingSphere(centerInit, centerFinal Vec3, radius float64, material Material) Sphere {
+	radiusVec := Vec3{radius, radius, radius}
+	box1 := NewAABBFromPoints(centerInit.Sub(radiusVec), centerInit.Add(radiusVec))
+	box2 := NewAABBFromPoints(centerFinal.Sub(radiusVec), centerFinal.Add(radiusVec))
+	bbox := NewAABBFromAABB(box1, box2)
+	return Sphere{
+		IsMoving:    true,
+		CenterInit:  centerInit,
+		CenterFinal: centerFinal,
+		Radius:      radius,
+		Material:    material,
+		AABB:        bbox,
+	}
 }
 
 func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
-	oc := r.Origin.Sub(s.Center)
+	oc := r.Origin.Sub(s.Center(r.Time))
 	a := r.Direction.LengthSquared()
 	h := oc.Dot(r.Direction)
 	c := oc.LengthSquared() - s.Radius*s.Radius
@@ -30,22 +63,44 @@ func (s Sphere) Hit(r Ray, i Interval) (bool, HitInfo) {
 	}
 
 	point := r.PointAt(root)
-	normal := point.Sub(s.Center).DivScalar(s.Radius)
-	normal, frontFace := s.CalculateFaceNormal(r, normal)
+	normal := point.Sub(s.Center(r.Time)).DivScalar(s.Radius)
+	normal, frontFace := CalculateFaceNormal(r, normal)
+	u, v := GetSphereUV(normal)
 	hitInfo := HitInfo{
 		Point:     point,
 		Normal:    normal,
 		Material:  s.Material,
 		T:         root,
+		U:         u,
+		V:         v,
 		FrontFace: frontFace,
 	}
 	return true, hitInfo
 }
 
-func (s Sphere) CalculateFaceNormal(r Ray, outwardNormal Vec3) (Vec3, bool) {
+func CalculateFaceNormal(r Ray, outwardNormal Vec3) (Vec3, bool) {
 	frontFace := r.Direction.Dot(outwardNormal) < 0
 	if !frontFace {
 		outwardNormal = outwardNormal.Neg()
 	}
 	return outwardNormal, frontFace
+}
+
+func (s Sphere) Center(time float64) Vec3 {
+	if !s.IsMoving {
+		return s.CenterInit
+	}
+	return s.CenterInit.Add(s.CenterFinal.Sub(s.CenterInit).MulScalar(time))
+}
+
+func (s Sphere) BoundingBox() AABB {
+	return s.AABB
+}
+
+func GetSphereUV(p Vec3) (float64, float64) {
+	phi := math.Atan2(p.Z, p.X)
+	theta := math.Asin(p.Y)
+	u := 1 - (phi+math.Pi)/(2*math.Pi)
+	v := (theta + math.Pi/2) / math.Pi
+	return u, v
 }
